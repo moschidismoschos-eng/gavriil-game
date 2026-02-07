@@ -1,0 +1,219 @@
+/* Gavriil Safety Adventure - simple, friendly UI */
+:root{
+  --bg: #0b1220;
+  --card: rgba(255,255,255,0.08);
+  --card2: rgba(255,255,255,0.12);
+  --text: rgba(255,255,255,0.92);
+  --muted: rgba(255,255,255,0.72);
+  --line: rgba(255,255,255,0.14);
+  --good: rgba(80, 220, 160, 0.95);
+  --bad: rgba(255, 120, 120, 0.95);
+}
+
+*{ box-sizing: border-box; }
+html, body { height: 100%; }
+body{
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  background: radial-gradient(1200px 600px at 20% 0%, rgba(110, 231, 255, 0.25), transparent),
+              radial-gradient(900px 500px at 90% 20%, rgba(167, 139, 250, 0.22), transparent),
+              radial-gradient(900px 600px at 50% 100%, rgba(34, 197, 94, 0.16), transparent),
+              var(--bg);
+  color: var(--text);
+}
+
+.topbar{
+  display:flex;
+  justify-content: space-between;
+  align-items:center;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  backdrop-filter: blur(10px);
+  background: rgba(11,18,32,0.55);
+}
+
+.brand{ display:flex; gap: 10px; align-items:center; }
+.logo{
+  width: 42px; height: 42px;
+  border-radius: 14px;
+  display:flex; align-items:center; justify-content:center;
+  background: rgba(255,255,255,0.10);
+  border: 1px solid var(--line);
+  font-size: 22px;
+}
+.title{ font-weight: 800; font-size: 16px; letter-spacing: 0.2px; }
+.subtitle{ font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.controls{ display:flex; gap: 10px; align-items:center; }
+select{
+  border-radius: 12px;
+  padding: 10px 10px;
+  background: rgba(255,255,255,0.10);
+  border: 1px solid var(--line);
+  color: var(--text);
+  outline: none;
+}
+select option { color: #111; }
+
+.wrap{
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 18px 14px 26px;
+}
+
+.card{
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: linear-gradient(180deg, var(--card), rgba(255,255,255,0.06));
+  box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+  padding: 16px;
+  overflow: hidden;
+}
+
+.row{
+  display:flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.pill{
+  padding: 8px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.08);
+  color: var(--text);
+  font-weight: 650;
+  font-size: 13px;
+}
+
+h1{
+  margin: 10px 2px 12px;
+  font-size: 22px;
+}
+
+.videoBox{
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.06);
+}
+video{
+  width: 100%;
+  height: auto;
+  display:block;
+  background: rgba(0,0,0,0.25);
+}
+.videoHint{
+  position: absolute;
+  inset: auto 10px 10px 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(255,255,255,0.14);
+  color: rgba(255,255,255,0.86);
+  font-size: 13px;
+  display: none;
+}
+
+.question{
+  margin: 14px 2px 12px;
+  font-size: 17px;
+  color: rgba(255,255,255,0.90);
+  line-height: 1.35;
+}
+
+.answers{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+button{
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 14px 14px;
+  font-size: 16px;
+  color: var(--text);
+  background: rgba(255,255,255,0.08);
+  cursor: pointer;
+  transition: transform 0.08s ease, background 0.2s ease, border-color 0.2s ease;
+  text-align: left;
+}
+button:hover{ background: rgba(255,255,255,0.12); }
+button:active{ transform: scale(0.99); }
+button[disabled]{ opacity: 0.6; cursor: not-allowed; }
+
+.primary{
+  background: rgba(59, 130, 246, 0.35);
+  border-color: rgba(59, 130, 246, 0.55);
+}
+.primary:hover{ background: rgba(59, 130, 246, 0.45); }
+
+.ghost{
+  background: rgba(255,255,255,0.06);
+}
+.ghost:hover{ background: rgba(255,255,255,0.10); }
+
+.choice.correct{
+  border-color: rgba(80, 220, 160, 0.65);
+  background: rgba(80, 220, 160, 0.18);
+}
+.choice.wrong{
+  border-color: rgba(255, 120, 120, 0.65);
+  background: rgba(255, 120, 120, 0.15);
+}
+
+.feedback{
+  margin-top: 12px;
+  min-height: 28px;
+  font-size: 16px;
+  font-weight: 700;
+}
+.feedback.good{ color: var(--good); }
+.feedback.bad{ color: var(--bad); }
+
+.actions{
+  display:flex;
+  gap: 10px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.footer{
+  padding: 18px 14px 24px;
+  border-top: 1px solid var(--line);
+  color: rgba(255,255,255,0.72);
+  text-align:center;
+  font-size: 13px;
+}
+
+/* Confetti */
+.confetti{
+  position: fixed;
+  top: -10px;
+  width: 10px;
+  height: 14px;
+  border-radius: 2px;
+  opacity: 0.95;
+  pointer-events: none;
+  animation: fall 1.2s linear forwards;
+  z-index: 9999;
+}
+@keyframes fall{
+  to { transform: translateY(110vh) rotate(540deg); opacity: 0.9; }
+}
+
+/* Soft shake for wrong */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+.shake{ animation: shake 0.35s ease; }

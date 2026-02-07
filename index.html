@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gavriil Safety Adventure</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">🛡️</div>
+      <div class="brandText">
+        <div class="title">Gavriil Safety Adventure</div>
+        <div class="subtitle" id="subtitle">Μάθε ασφάλεια παίζοντας</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <select id="langSelect" aria-label="Γλώσσα / Language">
+        <option value="el" selected>🇬🇷 Ελληνικά</option>
+        <option value="en">🇬🇧 English</option>
+      </select>
+      <button class="ghost" id="soundToggle" type="button">🔊</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="card">
+      <div class="row">
+        <div class="pill" id="chapterPill">Κεφάλαιο 1/6</div>
+        <div class="pill" id="scorePill">⭐ Σκορ: <span id="score">0</span></div>
+        <div class="pill" id="livesPill">❤️ <span id="lives">3</span></div>
+      </div>
+
+      <h1 id="levelTitle">Σπίτι: Πόρτα & ξένοι</h1>
+
+      <div class="videoBox" id="videoBox">
+        <video id="sceneVideo" playsinline preload="metadata" controls>
+          <source id="videoSource" src="assets/videos/door.mp4" type="video/mp4" />
+        </video>
+        <div class="videoHint" id="videoHint">
+          Αν δεν βλέπεις βίντεο, βάλε το αρχείο <b>assets/videos/door.mp4</b>.
+        </div>
+      </div>
+
+      <p class="question" id="question">
+        Κάποιος χτυπάει την πόρτα και λέει: «Άνοιξε, είμαι φίλος του μπαμπά». Τι κάνεις;
+      </p>
+
+      <div class="answers" id="answers"></div>
+
+      <div class="feedback" id="feedback" aria-live="polite"></div>
+
+      <div class="actions">
+        <button id="nextBtn" type="button" class="primary" disabled>➡️ Επόμενο</button>
+        <button id="retryBtn" type="button" class="ghost" hidden>🔄 Ξανά</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div id="footerLine1">© 2026 Gavriil Safety Adventure | Μόσχος</div>
+    <div id="footerLine2">Μάθε να είσαι ασφαλής – στο σπίτι, στο δρόμο και στο σχολείο.</div>
+  </footer>
+
+  <!-- Sounds (optional). Put your files in assets/sounds/ -->
+  <audio id="sndClick" src="assets/sounds/click.mp3" preload="auto"></audio>
+  <audio id="sndCorrect" src="assets/sounds/correct.mp3" preload="auto"></audio>
+  <audio id="sndWrong" src="assets/sounds/wrong.mp3" preload="auto"></audio>
+  <audio id="sndWin" src="assets/sounds/win.mp3" preload="auto"></audio>
+
+  <script src="script.js"></script>
+</body>
+</html>
