@@ -17,3 +17,4 @@ python -m http.server 8000
 
 Μετά άνοιξε:
 http://localhost:8000
+ 
