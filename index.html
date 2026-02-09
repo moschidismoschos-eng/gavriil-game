@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Το Συνεργείο του Μικρού Μηχανικού</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="wrap">
+    <div class="card">
+      <div class="top">
+        <div class="title">
+          <h1 id="title">Το Συνεργείο του Μικρού Μηχανικού</h1>
+          <p id="subtitle">Φτιάξε το αμάξι και κέρδισε ⭐</p>
+        </div>
+
+        <div class="controls">
+          <select id="langSelect">
+            <option value="el">Ελληνικά</option>
+            <option value="en">English</option>
+          </select>
+
+          <button class="btn" id="soundBtn">🔊 Ήχος</button>
+          <input type="range" id="volume" min="0" max="1" step="0.05" value="0.7">
+        </div>
+      </div>
+
+      <div class="row pill">
+        <div id="levelBox">Πίστα: 1</div>
+        <div id="starsBox">⭐ 0</div>
+        <div id="timeBox">Χρόνος: 00:00</div>
+      </div>
+
+      <h2 id="carName">Όχημα: -</h2>
+
+      <div class="hint" id="taskText">Πάτα διάγνωση για να δεις τι έχει το όχημα!</div>
+
+      <div class="actions">
+        <button class="btn" id="diagBtn">🔍 Διάγνωση</button>
+        <button class="btn" id="washBtn">🧽 Πλύσιμο</button>
+        <button class="btn" id="paintBtn">🎨 Βάψιμο</button>
+        <button class="btn" id="nextBtn">➡️ Επόμενο</button>
+        <button class="btn" id="newBtn">🔁 Νέο Παιχνίδι</button>
+      </div>
+
+      <h3>Εργαλεία</h3>
+      <div class="grid" id="tools"></div>
+
+      <h3>Καταγραφή</h3>
+      <div class="logbox" id="log"></div>
+
+      <div class="footer">
+        <span>🎮 Μικρός Μηχανικός</span>
+        <span>Made by Moschos</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <div id="miniModal" class="miniModal hidden">
+    <div class="miniBox">
+      <h2 id="miniTitle"></h2>
+      <p id="miniHint"></p>
+      <div id="miniArea"></div>
+      <button class="btn" id="miniClose">Κλείσιμο</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

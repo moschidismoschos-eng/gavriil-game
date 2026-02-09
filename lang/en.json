@@ -1,0 +1,20 @@
+{
+  "title":"Little Mechanic",
+  "sub":"Fix the vehicle and earn ⭐",
+  "sound":"Sound",
+  "level":"Level",
+  "time":"Time",
+  "diag":"Diagnosis",
+  "wash":"Wash",
+  "paint":"Paint",
+  "new":"New",
+  "tools":"Tools",
+  "log":"Log",
+  "ready":"Ready? Press “Diagnosis”!",
+  "found":"Fault found",
+  "pick":"Pick the correct tool:",
+  "correct":"Great! Correct!",
+  "wrong":"Wrong, try another.",
+  "washed":"Great wash! ✨",
+  "painted":"Nice paint! 🎨"
+}
