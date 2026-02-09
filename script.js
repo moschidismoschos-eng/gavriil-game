@@ -1,412 +1,439 @@
-// Gavriil Safety Adventure
-// Δίγλωσσο: Ελληνικά / Αγγλικά
-// Βίντεο ανά κεφάλαιο + εφέ (confetti, shake), σκορ, ζωές, ήχοι (προαιρετικά)
+// Συνεργείο παιδικό παιχνίδι (χωρίς εξωτερικές βιβλιοθήκες)
 
-const UI = {
-  langSelect: document.getElementById("langSelect"),
-  subtitle: document.getElementById("subtitle"),
-  chapterPill: document.getElementById("chapterPill"),
-  scoreEl: document.getElementById("score"),
-  livesEl: document.getElementById("lives"),
-  levelTitle: document.getElementById("levelTitle"),
-  question: document.getElementById("question"),
-  answers: document.getElementById("answers"),
-  feedback: document.getElementById("feedback"),
-  nextBtn: document.getElementById("nextBtn"),
-  retryBtn: document.getElementById("retryBtn"),
-  video: document.getElementById("sceneVideo"),
-  videoSource: document.getElementById("videoSource"),
-  videoHint: document.getElementById("videoHint"),
-  footerLine1: document.getElementById("footerLine1"),
-  footerLine2: document.getElementById("footerLine2"),
-  soundToggle: document.getElementById("soundToggle"),
-  sndClick: document.getElementById("sndClick"),
-  sndCorrect: document.getElementById("sndCorrect"),
-  sndWrong: document.getElementById("sndWrong"),
-  sndWin: document.getElementById("sndWin"),
-};
+const elLevel = document.getElementById("level");
+const elStars = document.getElementById("stars");
+const elTime = document.getElementById("time");
 
-let state = {
-  lang: "el",
-  score: 0,
-  lives: 3,
-  idx: 0,
-  locked: false,
-  soundOn: true,
-};
+const elCarName = document.getElementById("carName");
+const elCarEmoji = document.getElementById("carEmoji");
+const elBadges = document.getElementById("badges");
+const elTaskText = document.getElementById("taskText");
 
-const t = {
-  el: {
-    subtitle: "Μάθε ασφάλεια παίζοντας",
-    chapter: (i, n) => `Κεφάλαιο ${i}/${n}`,
-    score: (s) => `⭐ Σκορ: ${s}`,
-    lives: (l) => `❤️ ${l}`,
-    next: "➡️ Επόμενο",
-    retry: "🔄 Ξανά",
-    correct: "✅ Σωστά! Μπράβο!",
-    wrong: "❌ Όχι. Δοκίμασε ξανά!",
-    outOfLivesTitle: "Τέλος παιχνιδιού 😅",
-    outOfLivesText: "Τελείωσαν οι ζωές. Θες να ξαναπαίξεις;",
-    playAgain: "🔄 Παίξε ξανά",
-    winTitle: "🎉 Τέλος!",
-    winText: (s) => `Το τελικό σου σκορ είναι: ${s}`,
-    cert: "🏆 Πιστοποιητικό Ασφάλειας",
-    certText: "Είσαι μικρός ήρωας ασφάλειας!",
-    missingVideo: (path) => `Αν δεν βλέπεις βίντεο, βάλε το αρχείο <b>${path}</b>.`,
-    soundOn: "🔊",
-    soundOff: "🔇",
-  },
-  en: {
-    subtitle: "Learn safety by playing",
-    chapter: (i, n) => `Chapter ${i}/${n}`,
-    score: (s) => `⭐ Score: ${s}`,
-    lives: (l) => `❤️ ${l}`,
-    next: "➡️ Next",
-    retry: "🔄 Retry",
-    correct: "✅ Correct! Well done!",
-    wrong: "❌ Not quite. Try again!",
-    outOfLivesTitle: "Game over 😅",
-    outOfLivesText: "You ran out of lives. Play again?",
-    playAgain: "🔄 Play again",
-    winTitle: "🎉 Finished!",
-    winText: (s) => `Your final score is: ${s}`,
-    cert: "🏆 Safety Certificate",
-    certText: "You are a little safety hero!",
-    missingVideo: (path) => `If you don't see a video, add the file <b>${path}</b>.`,
-    soundOn: "🔊",
-    soundOff: "🔇",
-  }
-};
+const toolsEl = document.getElementById("tools");
+const logEl = document.getElementById("log");
 
-// Chapters (videos are local files you put in assets/videos/)
-const chapters = [
-  {
-    video: "assets/videos/door.mp4",
-    el: {
-      title: "Σπίτι: Πόρτα & ξένοι",
-      q: "Κάποιος χτυπάει την πόρτα και λέει: «Άνοιξε, είμαι φίλος του μπαμπά». Τι κάνεις;",
-      answers: [
-        "Ανοίγω την πόρτα",
-        "Ρωτάω ποιος είναι και φωνάζω τη μαμά/μπαμπά",
-        "Του λέω να φύγει και ανοίγω λίγο να δω"
-      ],
-      correct: 1,
-    },
-    en: {
-      title: "Home: Door & strangers",
-      q: "Someone knocks and says: “Open up, I'm dad's friend.” What do you do?",
-      answers: [
-        "Open the door",
-        "Ask who it is and call mom/dad",
-        "Open a little to look"
-      ],
-      correct: 1,
-    }
-  },
-  {
-    video: "assets/videos/sidewalk.mp4",
-    el: {
-      title: "Δρόμος: Πεζοδρόμιο",
-      q: "Περπατάς στη γειτονιά. Πού πρέπει να περπατάς;",
-      answers: [
-        "Στη μέση του δρόμου",
-        "Στο πεζοδρόμιο",
-        "Όπου βρω χώρο"
-      ],
-      correct: 1,
-    },
-    en: {
-      title: "Street: Sidewalk",
-      q: "You're walking outside. Where should you walk?",
-      answers: [
-        "In the middle of the road",
-        "On the sidewalk",
-        "Anywhere I find space"
-      ],
-      correct: 1,
-    }
-  },
-  {
-    video: "assets/videos/trafficlight.mp4",
-    el: {
-      title: "Δρόμος: Φανάρι",
-      q: "Το φανάρι για πεζούς είναι κόκκινο. Τι κάνεις;",
-      answers: [
-        "Περνάω γρήγορα",
-        "Περιμένω να γίνει πράσινο",
-        "Κοιτάω και περνάω αν δεν έχει αμάξι"
-      ],
-      correct: 1,
-    },
-    en: {
-      title: "Street: Traffic light",
-      q: "The pedestrian light is red. What do you do?",
-      answers: [
-        "Cross quickly",
-        "Wait for green",
-        "Look and cross if no cars"
-      ],
-      correct: 1,
-    }
-  },
-  {
-    video: "assets/videos/stranger.mp4",
-    el: {
-      title: "Σχολείο: Άγνωστος",
-      q: "Ένας άγνωστος σου λέει: «Έλα να σου δώσω σοκολάτα». Τι κάνεις;",
-      answers: [
-        "Πάω μαζί του",
-        "Φεύγω και πάω σε δάσκαλο/γονέα",
-        "Μένω εκεί και μιλάω μαζί του"
-      ],
-      correct: 1,
-    },
-    en: {
-      title: "School: Stranger",
-      q: "A stranger says: “Come, I’ll give you chocolate.” What do you do?",
-      answers: [
-        "Go with them",
-        "Leave and go to a teacher/parent",
-        "Stay and talk"
-      ],
-      correct: 1,
-    }
-  },
-  {
-    video: "assets/videos/school.mp4",
-    el: {
-      title: "Σχολείο: Χάθηκα",
-      q: "Χάθηκες κοντά στο σχολείο. Τι κάνεις;",
-      answers: [
-        "Τρέχω μόνος μου να βρω σπίτι",
-        "Πηγαίνω σε δάσκαλο/γραμματεία και ζητάω βοήθεια",
-        "Κρύβομαι και περιμένω"
-      ],
-      correct: 1,
-    },
-    en: {
-      title: "School: I’m lost",
-      q: "You are lost near school. What do you do?",
-      answers: [
-        "Run home alone",
-        "Go to a teacher/office and ask for help",
-        "Hide and wait"
-      ],
-      correct: 1,
-    }
-  },
-  {
-    video: "assets/videos/bus.mp4",
-    el: {
-      title: "Μετακίνηση: Στάση/Λεωφορείο",
-      q: "Περιμένεις το λεωφορείο. Πού στέκεσαι;",
-      answers: [
-        "Στην άκρη του δρόμου, πολύ κοντά",
-        "Στη στάση, λίγο πίσω από το πεζοδρόμιο",
-        "Μέσα στο δρόμο για να το βλέπω"
-      ],
-      correct: 1,
-    },
-    en: {
-      title: "Transport: Bus stop",
-      q: "You are waiting for the bus. Where do you stand?",
-      answers: [
-        "Right at the edge of the road",
-        "At the stop, a bit back on the sidewalk",
-        "In the road so I can see it"
-      ],
-      correct: 1,
-    }
-  }
+const diagBtn = document.getElementById("diagBtn");
+const washBtn = document.getElementById("washBtn");
+const paintBtn = document.getElementById("paintBtn");
+const nextBtn = document.getElementById("nextBtn");
+const newBtn = document.getElementById("newBtn");
+const endlessBtn = document.getElementById("endlessBtn");
+
+const miniModal = document.getElementById("miniModal");
+const miniTitle = document.getElementById("miniTitle");
+const miniHint = document.getElementById("miniHint");
+const miniArea = document.getElementById("miniArea");
+const miniClose = document.getElementById("miniClose");
+
+const toastEl = document.getElementById("toast");
+
+const CARS = [
+  { name:"Μικρό αυτοκίνητο", emoji:"🚗" },
+  { name:"Τζιπ", emoji:"🚙" },
+  { name:"Φορτηγό", emoji:"🚚" },
+  { name:"Βανάκι", emoji:"🚐" },
+  { name:"Ταξί", emoji:"🚕" },
+  { name:"Περιπολικό", emoji:"🚓" },
+  { name:"Ασθενοφόρο", emoji:"🚑" },
+  { name:"Πυροσβεστικό", emoji:"🚒" },
+  { name:"Αγωνιστικό", emoji:"🏎️" },
+  { name:"Λεωφορείο", emoji:"🚌" },
+  { name:"Pickup", emoji:"🛻" },
+  { name:"Τρακτέρ", emoji:"🚜" },
+  { name:"Μηχανάκι", emoji:"🛵" },
+  { name:"Νταλίκα", emoji:"🚛" },
+  { name:"Τρίκυκλο", emoji:"🛺" }
 ];
 
-function safePlay(audioEl){
-  if(!state.soundOn) return;
-  if(!audioEl) return;
-  try{
-    audioEl.currentTime = 0;
-    audioEl.play().catch(()=>{});
-  }catch(e){}
+const FAULTS = {
+  tire: { key:"tire", label:"Σκασμένο λάστιχο", badge:"🛞", tool:"jack" },
+  battery: { key:"battery", label:"Άδεια μπαταρία", badge:"🔋", tool:"battery" },
+  oil: { key:"oil", label:"Χρειάζεται λάδι", badge:"🛢️", tool:"oil" },
+  lights: { key:"lights", label:"Καμένο φανάρι", badge:"💡", tool:"bulb" },
+  overheat: { key:"overheat", label:"Υπερθέρμανση", badge:"🌡️", tool:"coolant" },
+  dirty: { key:"dirty", label:"Βρώμικο", badge:"🧼", tool:"sponge" }
+};
+
+const TOOLS = [
+  { id:"jack", ico:"🛞", title:"Ρεζέρβα / Γρύλος", desc:"για λάστιχο" },
+  { id:"battery", ico:"🔋", title:"Μπαταρία", desc:"για εκκίνηση" },
+  { id:"oil", ico:"🛢️", title:"Λάδι", desc:"για τον κινητήρα" },
+  { id:"bulb", ico:"💡", title:"Λαμπάκι", desc:"για φώτα" },
+  { id:"coolant", ico:"🧯", title:"Νερό/Ψυκτικό", desc:"για θερμοκρασία" },
+  { id:"sponge", ico:"🧽", title:"Σφουγγάρι", desc:"για πλύσιμο" }
+];
+
+// 25 πίστες (1-25). Μετά: endless (random)
+const LEVELS = [
+  ["dirty"],
+  ["tire"],
+  ["oil"],
+  ["battery"],
+  ["lights"],
+  ["dirty","tire"],
+  ["oil","dirty"],
+  ["battery","dirty"],
+  ["lights","dirty"],
+  ["overheat"],
+  ["tire","oil"],
+  ["battery","lights"],
+  ["overheat","dirty"],
+  ["tire","battery"],
+  ["oil","lights"],
+  ["tire","dirty","oil"],
+  ["battery","dirty","lights"],
+  ["overheat","tire"],
+  ["overheat","battery"],
+  ["overheat","oil","dirty"],
+  ["tire","battery","lights"],
+  ["tire","oil","lights"],
+  ["battery","oil","dirty"],
+  ["overheat","tire","dirty"],
+  ["overheat","tire","battery","dirty"]
+];
+
+let state = {
+  level: 1,
+  stars: 0,
+  currentCar: null,
+  faults: [],
+  diagnosed: false,
+  fixed: new Set(),
+  painted: false,
+  washed: false,
+  endless: false,
+  seconds: 0,
+  timerId: null
+};
+
+function pad(n){ return String(n).padStart(2,"0"); }
+function fmtTime(s){ return `${pad(Math.floor(s/60))}:${pad(s%60)}`; }
+
+function toast(text){
+  toastEl.textContent = text;
+  toastEl.classList.remove("hidden");
+  setTimeout(()=>toastEl.classList.add("hidden"), 1300);
 }
 
-function updateTopUI(){
-  const n = chapters.length;
-  UI.subtitle.textContent = t[state.lang].subtitle;
-  UI.chapterPill.textContent = t[state.lang].chapter(state.idx + 1, n);
-  UI.scoreEl.textContent = state.score;
-  UI.livesEl.textContent = state.lives;
-  UI.nextBtn.textContent = t[state.lang].next;
-  UI.retryBtn.textContent = t[state.lang].retry;
-  UI.soundToggle.textContent = state.soundOn ? t[state.lang].soundOn : t[state.lang].soundOff;
-
-  // Footer bilingual
-  UI.footerLine1.textContent = state.lang === "el"
-    ? "© 2026 Gavriil Safety Adventure | Μόσχος"
-    : "© 2026 Gavriil Safety Adventure | Moschos";
-  UI.footerLine2.textContent = state.lang === "el"
-    ? "Μάθε να είσαι ασφαλής – στο σπίτι, στο δρόμο και στο σχολείο."
-    : "Learn to stay safe – at home, on the street, and at school.";
+function log(text, good=false){
+  logEl.textContent = text;
+  logEl.style.color = good ? "var(--ok)" : "var(--muted)";
 }
 
-function renderChapter(){
-  state.locked = false;
-  UI.nextBtn.disabled = true;
-  UI.retryBtn.hidden = true;
-  UI.feedback.className = "feedback";
-  UI.feedback.textContent = "";
+function startTimer(){
+  stopTimer();
+  state.seconds = 0;
+  elTime.textContent = "00:00";
+  state.timerId = setInterval(()=>{
+    state.seconds += 1;
+    elTime.textContent = fmtTime(state.seconds);
+  }, 1000);
+}
+function stopTimer(){
+  if (state.timerId){
+    clearInterval(state.timerId);
+    state.timerId = null;
+  }
+}
 
-  const ch = chapters[state.idx];
-  const loc = ch[state.lang];
+function rand(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function shuffle(a){
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
 
-  UI.levelTitle.textContent = loc.title;
-  UI.question.textContent = loc.q;
-
-  // Video
-  UI.videoHint.innerHTML = t[state.lang].missingVideo(ch.video);
-  UI.videoHint.style.display = "none";
-  UI.videoSource.src = ch.video;
-  UI.video.load();
-
-  // Show hint if video fails to load
-  const showHint = () => { UI.videoHint.style.display = "block"; };
-  UI.video.onerror = showHint;
-  UI.video.addEventListener("error", showHint, { once: true });
-
-  // Answers
-  UI.answers.innerHTML = "";
-  loc.answers.forEach((txt, i) => {
+function renderTools(){
+  toolsEl.innerHTML = "";
+  TOOLS.forEach(t=>{
     const btn = document.createElement("button");
-    btn.className = "choice";
+    btn.className = "tool";
     btn.type = "button";
-    btn.textContent = txt;
-    btn.addEventListener("click", () => onAnswer(i));
-    UI.answers.appendChild(btn);
+    btn.dataset.id = t.id;
+    btn.innerHTML = `
+      <div class="ico">${t.ico}</div>
+      <div class="txt"><b>${t.title}</b><span>${t.desc}</span></div>
+    `;
+    btn.addEventListener("click", ()=>useTool(t.id));
+    toolsEl.appendChild(btn);
   });
-
-  updateTopUI();
 }
 
-function confettiBurst(count=26){
-  for(let i=0;i<count;i++){
-    const c = document.createElement("div");
-    c.className = "confetti";
-    c.style.left = Math.random()*100 + "vw";
-    c.style.transform = `translateY(0) rotate(${Math.random()*180}deg)`;
-    c.style.background = `hsl(${Math.floor(Math.random()*360)}, 90%, 65%)`;
-    c.style.animationDuration = (0.9 + Math.random()*0.7) + "s";
-    document.body.appendChild(c);
-    setTimeout(()=>c.remove(), 1800);
+function setBadges(){
+  elBadges.innerHTML = "";
+  state.faults.forEach(k=>{
+    const f = FAULTS[k];
+    const b = document.createElement("div");
+    b.className = "badge bad";
+    const fixed = state.fixed.has(k);
+    b.textContent = fixed ? `✅ ${f.badge} ${f.label}` : `${f.badge} ${f.label}`;
+    elBadges.appendChild(b);
+  });
+}
+
+function currentFaultsText(){
+  if (!state.diagnosed) return "Πάτα «Διάγνωση» για να δεις τι χάλασε.";
+  const remaining = state.faults.filter(k=>!state.fixed.has(k));
+  if (remaining.length === 0){
+    return "Τέλειο! Το αμάξι είναι έτοιμο. Πάτα «Επόμενο αυτοκίνητο».";
   }
+  const names = remaining.map(k=>FAULTS[k].label).join(", ");
+  return `Χάλασε: ${names}. Διάλεξε το σωστό εργαλείο!`;
 }
 
-function shakeCard(){
-  const card = document.querySelector(".card");
-  card.classList.remove("shake");
-  // reflow
-  void card.offsetWidth;
-  card.classList.add("shake");
-  setTimeout(()=>card.classList.remove("shake"), 400);
+function setTaskText(){
+  elTaskText.textContent = currentFaultsText();
 }
 
-function onAnswer(choiceIdx){
-  if(state.locked) return;
-  safePlay(UI.sndClick);
+function levelFaults(level){
+  if (state.endless){
+    // random: 1-3 βλάβες, σπάνια 4
+    const keys = Object.keys(FAULTS);
+    shuffle(keys);
+    const count = Math.random() < 0.1 ? 4 : (Math.random()<0.45 ? 1 : (Math.random()<0.85 ? 2 : 3));
+    const faults = keys.slice(0, count);
+    // προσθέτουμε συχνά "dirty" για παιδικό
+    if (!faults.includes("dirty") && Math.random() < 0.35) faults.push("dirty");
+    return Array.from(new Set(faults));
+  }
+  const idx = Math.min(level, LEVELS.length) - 1;
+  return LEVELS[idx] ? [...LEVELS[idx]] : [...LEVELS[LEVELS.length-1]];
+}
 
-  const ch = chapters[state.idx][state.lang];
-  const correctIdx = ch.correct;
+function pickCar(){
+  // εναλλαγή τύπων – τυχαίο
+  return rand(CARS);
+}
 
-  const buttons = Array.from(UI.answers.querySelectorAll("button.choice"));
-  buttons.forEach(b => b.disabled = true);
+function resetForNewCar(){
+  state.currentCar = pickCar();
+  state.faults = levelFaults(state.level);
+  state.diagnosed = false;
+  state.fixed = new Set();
+  state.painted = false;
+  state.washed = false;
 
-  state.locked = true;
+  elCarName.textContent = state.currentCar.name;
+  elCarEmoji.textContent = state.currentCar.emoji;
 
-  if(choiceIdx === correctIdx){
-    buttons[choiceIdx].classList.add("correct");
-    UI.feedback.classList.add("good");
-    UI.feedback.textContent = t[state.lang].correct;
-    state.score += 10;
-    UI.nextBtn.disabled = false;
-    confettiBurst(24);
-    safePlay(UI.sndCorrect);
+  elLevel.textContent = String(state.level);
+  elStars.textContent = String(state.stars);
+  setBadges();
+  setTaskText();
+
+  nextBtn.disabled = true;
+  log("Διάλεξε «Διάγνωση» για να ξεκινήσεις.");
+  startTimer();
+}
+
+function diagnose(){
+  state.diagnosed = true;
+  setBadges();
+  setTaskText();
+  log("Εντάξει! Τώρα διάλεξε εργαλείο.", true);
+  toast("🔍 Διάγνωση ολοκληρώθηκε");
+}
+
+function canFinish(){
+  const remaining = state.faults.filter(k=>!state.fixed.has(k));
+  return remaining.length === 0;
+}
+
+function awardStars(){
+  // απλό σύστημα: γρήγορα => 3, μέτρια =>2, αργά =>1
+  const s = state.seconds;
+  let add = 1;
+  if (s <= 25) add = 3;
+  else if (s <= 45) add = 2;
+  state.stars += add;
+  elStars.textContent = String(state.stars);
+  toast(`⭐ +${add}`);
+}
+
+function finishCar(){
+  stopTimer();
+  awardStars();
+  log("ΜΠΡΑΒΟ! Το έφτιαξες! Πάτα «Επόμενο αυτοκίνητο».", true);
+  nextBtn.disabled = false;
+  setTaskText();
+}
+
+function wash(){
+  if (!state.diagnosed){
+    toast("Πρώτα διάγνωση!");
+    return;
+  }
+  // πλύσιμο = φτιάχνει dirty αν υπάρχει
+  if (state.faults.includes("dirty") && !state.fixed.has("dirty")){
+    state.fixed.add("dirty");
+    state.washed = true;
+    toast("🚿 Καθαρό!");
+    log("Καθάρισες το αμάξι. 👍", true);
+    setBadges();
+    setTaskText();
+    if (canFinish()) finishCar();
   } else {
-    buttons[choiceIdx].classList.add("wrong");
-    buttons[correctIdx].classList.add("correct");
-    UI.feedback.classList.add("bad");
-    UI.feedback.textContent = t[state.lang].wrong;
-    state.lives -= 1;
-    shakeCard();
-    if(navigator.vibrate) navigator.vibrate(120);
-    safePlay(UI.sndWrong);
+    toast("Δεν χρειάζεται πλύσιμο τώρα.");
+  }
+}
 
-    if(state.lives <= 0){
-      setTimeout(()=>renderGameOver(), 450);
-      return;
-    }
-    UI.retryBtn.hidden = false;
+function paint(){
+  if (!state.diagnosed){
+    toast("Πρώτα διάγνωση!");
+    return;
+  }
+  state.painted = true;
+  // “αθώο” fun feature
+  toast("🎨 Έβαψες το αμάξι!");
+  log("Ωραίο χρώμα! 😄", true);
+}
+
+function openMiniGameTire(onWin){
+  miniTitle.textContent = "🛞 Αλλαγή λάστιχου";
+  miniHint.textContent = "Πάτα τα μπουλόνια με τη σωστή σειρά: 1 → 2 → 3 → 4";
+  miniArea.innerHTML = "";
+
+  const wrap = document.createElement("div");
+  wrap.className = "bolts";
+
+  let expected = 1;
+
+  for (let i=1;i<=4;i++){
+    const b = document.createElement("button");
+    b.className = "bolt";
+    b.type = "button";
+    b.textContent = String(i);
+    b.addEventListener("click", ()=>{
+      if (i === expected){
+        b.classList.add("good");
+        b.disabled = true;
+        expected += 1;
+        if (expected === 5){
+          // νίκη
+          hideMini();
+          toast("🛞 Έτοιμο!");
+          onWin();
+        }
+      } else {
+        b.classList.add("bad");
+        setTimeout(()=>b.classList.remove("bad"), 250);
+        toast("❌ Λάθος σειρά!");
+      }
+    });
+    wrap.appendChild(b);
   }
 
-  updateTopUI();
+  miniArea.appendChild(wrap);
+  miniModal.classList.remove("hidden");
 }
 
-function renderGameOver(){
-  const lang = state.lang;
-  document.querySelector(".card").innerHTML = `
-    <div class="row">
-      <div class="pill">${t[lang].chapter(chapters.length, chapters.length)}</div>
-      <div class="pill">⭐ ${state.score}</div>
-    </div>
-    <h1>${t[lang].outOfLivesTitle}</h1>
-    <p class="question">${t[lang].outOfLivesText}</p>
-    <div class="actions">
-      <button class="primary" id="playAgainBtn" type="button">${t[lang].playAgain}</button>
-    </div>
-  `;
-  document.getElementById("playAgainBtn").addEventListener("click", () => location.reload());
+function hideMini(){
+  miniModal.classList.add("hidden");
 }
 
-function renderWin(){
-  const lang = state.lang;
-  safePlay(UI.sndWin);
-  confettiBurst(50);
-
-  document.querySelector(".card").innerHTML = `
-    <div class="row">
-      <div class="pill">⭐ ${state.score}</div>
-      <div class="pill">${t[lang].cert}</div>
-    </div>
-    <h1>${t[lang].winTitle}</h1>
-    <p class="question">${t[lang].winText(state.score)}</p>
-    <p class="question">${t[lang].certText}</p>
-    <div class="actions">
-      <button class="primary" id="playAgainBtn" type="button">${t[lang].playAgain}</button>
-    </div>
-  `;
-  document.getElementById("playAgainBtn").addEventListener("click", () => location.reload());
-}
-
-UI.nextBtn.addEventListener("click", () => {
-  if(state.idx < chapters.length - 1){
-    state.idx += 1;
-    renderChapter();
-  } else {
-    renderWin();
+function useTool(toolId){
+  if (!state.diagnosed){
+    toast("Πρώτα διάγνωση!");
+    return;
   }
-});
 
-UI.retryBtn.addEventListener("click", () => {
-  // retry same chapter (no score change)
-  renderChapter();
-});
+  const remaining = state.faults.filter(k=>!state.fixed.has(k));
+  if (remaining.length === 0){
+    toast("Το αμάξι είναι ήδη έτοιμο!");
+    return;
+  }
 
-UI.langSelect.addEventListener("change", (e) => {
-  state.lang = e.target.value;
-  // keep current index, rerender
-  renderChapter();
-});
+  // αν το εργαλείο ταιριάζει με κάποια βλάβη που μένει
+  const match = remaining.find(k => FAULTS[k].tool === toolId);
 
-UI.soundToggle.addEventListener("click", () => {
-  state.soundOn = !state.soundOn;
-  updateTopUI();
-});
+  if (!match){
+    toast("❌ Αυτό δεν ταιριάζει");
+    log("Δοκίμασε άλλο εργαλείο.", false);
+    return;
+  }
 
-renderChapter();
+  // ειδική περίπτωση: λάστιχο με mini game
+  if (match === "tire"){
+    openMiniGameTire(()=>{
+      state.fixed.add("tire");
+      setBadges();
+      setTaskText();
+      log("Έφτιαξες το λάστιχο! ✅", true);
+      if (canFinish()) finishCar();
+    });
+    return;
+  }
+
+  // απλό fix
+  state.fixed.add(match);
+  setBadges();
+  setTaskText();
+  toast("✅ Επιδιόρθωση!");
+  log(`Έφτιαξες: ${FAULTS[match].label} ✅`, true);
+
+  if (canFinish()) finishCar();
+}
+
+function nextCar(){
+  if (!canFinish()){
+    toast("Πρώτα φτιάξε όλες τις βλάβες!");
+    return;
+  }
+  state.level += 1;
+  elLevel.textContent = String(state.level);
+
+  // μετά την πίστα 25, προτείνουμε endless
+  if (!state.endless && state.level > 25){
+    log("Τέλος οι πίστες! Πάτα «Endless» για ατελείωτα αυτοκίνητα 😄", true);
+    toast("🏁 Τέλος πιστών!");
+    // κρατάμε level = 25 και περιμένουμε endless
+    state.level = 25;
+    elLevel.textContent = "25";
+    nextBtn.disabled = true;
+    return;
+  }
+
+  resetForNewCar();
+}
+
+function newGame(){
+  state = {
+    level: 1,
+    stars: 0,
+    currentCar: null,
+    faults: [],
+    diagnosed: false,
+    fixed: new Set(),
+    painted: false,
+    washed: false,
+    endless: false,
+    seconds: 0,
+    timerId: null
+  };
+  renderTools();
+  resetForNewCar();
+}
+
+function enableEndless(){
+  state.endless = true;
+  toast("♾️ Endless ON");
+  log("Endless mode! Κάθε φορά τυχαίες βλάβες.", true);
+  state.level += 1;
+  elLevel.textContent = String(state.level);
+  resetForNewCar();
+}
+
+// events
+diagBtn.addEventListener("click", diagnose);
+washBtn.addEventListener("click", wash);
+paintBtn.addEventListener("click", paint);
+nextBtn.addEventListener("click", nextCar);
+newBtn.addEventListener("click", newGame);
+endlessBtn.addEventListener("click", enableEndless);
+miniClose.addEventListener("click", hideMini);
+
+// init
+renderTools();
+resetForNewCar();

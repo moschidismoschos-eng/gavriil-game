@@ -1,74 +1,80 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="el">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gavriil Safety Adventure</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Το Συνεργείο του Μικρού Μηχανικού</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <div class="logo">🛡️</div>
-      <div class="brandText">
-        <div class="title">Gavriil Safety Adventure</div>
-        <div class="subtitle" id="subtitle">Μάθε ασφάλεια παίζοντας</div>
+  <div class="app">
+    <header class="top">
+      <div class="title">
+        <h1>Το Συνεργείο του Μικρού Μηχανικού</h1>
+        <p class="sub">Φτιάξε το αμάξι και κέρδισε ⭐</p>
       </div>
-    </div>
-
-    <div class="controls">
-      <select id="langSelect" aria-label="Γλώσσα / Language">
-        <option value="el" selected>🇬🇷 Ελληνικά</option>
-        <option value="en">🇬🇧 English</option>
-      </select>
-      <button class="ghost" id="soundToggle" type="button">🔊</button>
-    </div>
-  </header>
-
-  <main class="wrap">
-    <section class="card">
-      <div class="row">
-        <div class="pill" id="chapterPill">Κεφάλαιο 1/6</div>
-        <div class="pill" id="scorePill">⭐ Σκορ: <span id="score">0</span></div>
-        <div class="pill" id="livesPill">❤️ <span id="lives">3</span></div>
+      <div class="hud">
+        <div class="pill"><span>Πίστα</span><b id="level">1</b></div>
+        <div class="pill"><span>Αστέρια</span><b id="stars">0</b></div>
+        <div class="pill"><span>Χρόνος</span><b id="time">00:00</b></div>
+        <button id="newBtn" class="btn ghost" title="Νέο παιχνίδι">Νέο</button>
       </div>
+    </header>
 
-      <h1 id="levelTitle">Σπίτι: Πόρτα & ξένοι</h1>
+    <main class="grid">
+      <section class="card carCard" aria-label="Αυτοκίνητο">
+        <div class="carHeader">
+          <div class="carName" id="carName">—</div>
+          <div class="badges" id="badges"></div>
+        </div>
 
-      <div class="videoBox" id="videoBox">
-        <video id="sceneVideo" playsinline preload="metadata" controls>
-          <source id="videoSource" src="assets/videos/door.mp4" type="video/mp4" />
-        </video>
-        <div class="videoHint" id="videoHint">
-          Αν δεν βλέπεις βίντεο, βάλε το αρχείο <b>assets/videos/door.mp4</b>.
+        <div class="carStage">
+          <div class="carEmoji" id="carEmoji" aria-hidden="true">🚗</div>
+
+          <div class="bubble" id="bubble">
+            <div class="bubbleTitle">Διάγνωση</div>
+            <div class="bubbleText" id="taskText">Πάτα «Διάγνωση» για να δεις τι χάλασε.</div>
+          </div>
+        </div>
+
+        <div class="carActions">
+          <button id="diagBtn" class="btn">🔍 Διάγνωση</button>
+          <button id="washBtn" class="btn">🚿 Πλύσιμο</button>
+          <button id="paintBtn" class="btn">🎨 Βάψιμο</button>
+        </div>
+      </section>
+
+      <section class="card toolCard" aria-label="Εργαλεία">
+        <h2>Εργαλειοθήκη</h2>
+        <p class="muted">Διάλεξε το σωστό εργαλείο για τη βλάβη.</p>
+
+        <div class="tools" id="tools"></div>
+
+        <div class="log" id="log" aria-live="polite"></div>
+
+        <div class="footerRow">
+          <button id="nextBtn" class="btn primary" disabled>Επόμενο αυτοκίνητο</button>
+          <button id="endlessBtn" class="btn ghost" title="Μετά την πίστα 25">Endless</button>
+        </div>
+      </section>
+    </main>
+
+    <!-- Mini-game modal -->
+    <div class="modal hidden" id="miniModal" role="dialog" aria-modal="true">
+      <div class="modalCard">
+        <h3 id="miniTitle">Μίνι Παιχνίδι</h3>
+        <p class="muted" id="miniHint">—</p>
+
+        <div id="miniArea"></div>
+
+        <div class="modalActions">
+          <button id="miniClose" class="btn ghost">Άκυρο</button>
         </div>
       </div>
+    </div>
 
-      <p class="question" id="question">
-        Κάποιος χτυπάει την πόρτα και λέει: «Άνοιξε, είμαι φίλος του μπαμπά». Τι κάνεις;
-      </p>
-
-      <div class="answers" id="answers"></div>
-
-      <div class="feedback" id="feedback" aria-live="polite"></div>
-
-      <div class="actions">
-        <button id="nextBtn" type="button" class="primary" disabled>➡️ Επόμενο</button>
-        <button id="retryBtn" type="button" class="ghost" hidden>🔄 Ξανά</button>
-      </div>
-    </section>
-  </main>
-
-  <footer class="footer">
-    <div id="footerLine1">© 2026 Gavriil Safety Adventure | Μόσχος</div>
-    <div id="footerLine2">Μάθε να είσαι ασφαλής – στο σπίτι, στο δρόμο και στο σχολείο.</div>
-  </footer>
-
-  <!-- Sounds (optional). Put your files in assets/sounds/ -->
-  <audio id="sndClick" src="assets/sounds/click.mp3" preload="auto"></audio>
-  <audio id="sndCorrect" src="assets/sounds/correct.mp3" preload="auto"></audio>
-  <audio id="sndWrong" src="assets/sounds/wrong.mp3" preload="auto"></audio>
-  <audio id="sndWin" src="assets/sounds/win.mp3" preload="auto"></audio>
+    <div class="toast hidden" id="toast"></div>
+  </div>
 
   <script src="script.js"></script>
 </body>
